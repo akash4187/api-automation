@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="API Automation Suite" parallel="classes" thread-count="3" verbose="1">
+
+    <listeners>
+        <listener class-name="com.api.listeners.TestListener"/>
+        <listener class-name="com.api.listeners.ExtentReportListener"/>
+        <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
+    </listeners>
+
+    <!-- ============ AutomationExercise.com API Tests ============ -->
+
+    <test name="AutomationExercise - Products API">
+        <classes>
+            <class name="com.api.tests.automationexercise.ProductsTests"/>
+        </classes>
+    </test>
+
+    <test name="AutomationExercise - Brands API">
+        <classes>
+            <class name="com.api.tests.automationexercise.BrandsTests"/>
+        </classes>
+    </test>
+
+    <test name="AutomationExercise - Login API">
+        <classes>
+            <class name="com.api.tests.automationexercise.LoginTests"/>
+        </classes>
+    </test>
+
+    <test name="AutomationExercise - User Account API">
+        <classes>
+            <class name="com.api.tests.automationexercise.UserAccountTests"/>
+        </classes>
+    </test>
+
+    <!-- ============ Reqres.in API Tests (Sample) ============ -->
+
+    <test name="Reqres - User Management Tests">
+        <classes>
+            <class name="com.api.tests.UserTests"/>
+        </classes>
+    </test>
+
+    <test name="Reqres - Authentication Tests">
+        <classes>
+            <class name="com.api.tests.AuthTests"/>
+        </classes>
+    </test>
+
+</suite>

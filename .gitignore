@@ -1,0 +1,29 @@
+# Build output
+target/
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Allure results
+allure-results/
+allure-report/
+
+# AspectJ dump files
+ajcore.*.txt
+
+# Environment-specific configs (secrets)
+src/main/resources/config-local.properties
+.env
