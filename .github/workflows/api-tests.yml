@@ -1,0 +1,83 @@
+name: API Automation Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+      test_suite:
+        description: 'TestNG suite file'
+        required: true
+        default: 'testng-automationexercise.xml'
+        type: choice
+        options:
+          - testng-automationexercise.xml
+          - testng.xml
+
+jobs:
+  api-tests:
+    runs-on: ubuntu-latest
+    name: Run API Tests
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@v4
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Run API Tests
+        run: |
+          mvn clean test \
+            -Dsurefire.suiteXmlFiles=${{ github.event.inputs.test_suite || 'testng-automationexercise.xml' }} \
+            -Denvironment=${{ github.event.inputs.environment || 'dev' }}
+
+      - name: Upload ExtentReport
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: extent-report
+          path: target/extent-reports/*.html
+          retention-days: 30
+
+      - name: Upload Surefire Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: target/surefire-reports/
+          retention-days: 10
+
+      - name: Test Results Summary
+        if: always()
+        run: |
+          echo "## Test Results" >> $GITHUB_STEP_SUMMARY
+          if [ -f target/surefire-reports/testng-results.xml ]; then
+            TOTAL=$(grep -oP 'total="\K[^"]+' target/surefire-reports/testng-results.xml | head -1)
+            PASSED=$(grep -oP 'passed="\K[^"]+' target/surefire-reports/testng-results.xml | head -1)
+            FAILED=$(grep -oP 'failed="\K[^"]+' target/surefire-reports/testng-results.xml | head -1)
+            SKIPPED=$(grep -oP 'skipped="\K[^"]+' target/surefire-reports/testng-results.xml | head -1)
+            echo "| Metric | Count |" >> $GITHUB_STEP_SUMMARY
+            echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+            echo "| Total | $TOTAL |" >> $GITHUB_STEP_SUMMARY
+            echo "| ✅ Passed | $PASSED |" >> $GITHUB_STEP_SUMMARY
+            echo "| ❌ Failed | $FAILED |" >> $GITHUB_STEP_SUMMARY
+            echo "| ⏭️ Skipped | $SKIPPED |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No test results found." >> $GITHUB_STEP_SUMMARY
+          fi
